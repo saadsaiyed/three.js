@@ -1,34 +1,24 @@
 import './style.css'
 import { BufferAttribute, DoubleSide, FlatShading, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, WebGLRenderer } from 'three';
-import * as DAT from "dat.gui";
 
 
 //Initiate scene - START
-    // Adding GUI editor - START
-        const gui = new DAT.GUI()
-        const world = {
-            plane: {
-                width: 400,
-                height: 400,
-                widthSegments: 50,
-                heightSegments: 50
-            },
-            light: {
-                x: 0,
-                y: 0,
-                z: 10,
-                color: 0x55ff99,
-                intensity: 2
-            }
+    const world = {
+        plane: {
+            width: 400,
+            height: 400,
+            widthSegments: 50,
+            heightSegments: 50
+        },
+        light: {
+            x: 0,
+            y: 0,
+            z: 10,
+            color: 0x55ff99,
+            intensity: 2
         }
-    // Adding GUI editor - END
+    }
 
-    gui.add(world.plane, 'width', 1, 500).onChange(generatePlane)
-    gui.add(world.plane, 'height', 1, 500).onChange(generatePlane)
-    gui.add(world.plane, 'widthSegments', 1, 100).onChange(generatePlane)
-    gui.add(world.plane, 'heightSegments', 1, 100).onChange(generatePlane)
-    gui.close()
-    
     const scene = new Scene();
 
     const camera = new PerspectiveCamera(
