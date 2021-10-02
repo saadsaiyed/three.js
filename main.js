@@ -61,8 +61,8 @@ import { BufferAttribute, DoubleSide, FlatShading, Mesh, MeshPhongMaterial, Pers
     //Lighting - END
 
     const mouse = {
-        x: undefined,
-        y: undefined
+        x: 0,
+        y: 0
     }
 
 //Initiate scene - END
