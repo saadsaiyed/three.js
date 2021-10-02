@@ -1,8 +1,5 @@
 import './style.css'
-import gsap from 'gsap'
-import * as THREE from 'three'
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
-import { BufferAttribute, DirectionalLight, DoubleSide, FlatShading, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, Raycaster, Scene, WebGLRenderer } from 'three';
+import { BufferAttribute, DoubleSide, FlatShading, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, WebGLRenderer } from 'three';
 import * as DAT from "dat.gui";
 
 
@@ -15,6 +12,13 @@ import * as DAT from "dat.gui";
                 height: 400,
                 widthSegments: 50,
                 heightSegments: 50
+            },
+            light: {
+                x: 0,
+                y: 0,
+                z: 10,
+                color: 0x55ff99,
+                intensity: 2
             }
         }
     // Adding GUI editor - END
@@ -23,10 +27,8 @@ import * as DAT from "dat.gui";
     gui.add(world.plane, 'height', 1, 500).onChange(generatePlane)
     gui.add(world.plane, 'widthSegments', 1, 100).onChange(generatePlane)
     gui.add(world.plane, 'heightSegments', 1, 100).onChange(generatePlane)
-
-
-    const raycaster = new Raycaster()
-
+    gui.close()
+    
     const scene = new Scene();
 
     const camera = new PerspectiveCamera(
@@ -42,8 +44,6 @@ import * as DAT from "dat.gui";
     renderer.setPixelRatio(devicePixelRatio);
     document.body.appendChild(renderer.domElement);
     
-    new OrbitControls(camera, renderer.domElement);
-
     const plane = new Mesh(
         new PlaneGeometry(
             world.plane.width,
@@ -61,13 +61,13 @@ import * as DAT from "dat.gui";
     generatePlane();
     
     //Lighting - START
-        const light = new DirectionalLight(0xFFFFFF, 1)
-        light.position.set(0, 5, 5)
-        scene.add(light);
-        
-        const backLight = new DirectionalLight(0xFFFFFF, 1)
-        backLight.position.set(0, 0, -5)
-        scene.add(backLight);
+        const pointLight = new PointLight(world.light.color, world.light.intensity, 100)
+        pointLight.position.set(
+            world.light.x,
+            world.light.y,
+            world.light.z
+        );
+        scene.add(pointLight);
     //Lighting - END
 
     const mouse = {
@@ -114,13 +114,12 @@ function generatePlane() {
         plane.geometry.setAttribute('color', new BufferAttribute(new Float32Array(colors), 3));
     // Vertices Coloring - END
 }
+
 let frame = 0 
 function animate() {
     //perform an animation and requests that the browser calls a specified function to update an animation before the next repaint
     requestAnimationFrame(animate);
     frame += 0.01;
-    renderer.render(scene, camera)
-    raycaster.setFromCamera(mouse, camera)
 
     //Moving plane with individual vertices - START
         const {array, originalPosition, randomValues} = plane.geometry.attributes.position
@@ -131,49 +130,10 @@ function animate() {
         plane.geometry.attributes.position.needsUpdate = true;
     //Moving plane with individual vertices - END
 
-    const intersects = raycaster.intersectObject(plane)
-    if (intersects.length > 0) {
-        const { color } = intersects[0].object.geometry.attributes;
+    //Updating light position relative to mouse position
+    pointLight.position.set(mouse.x , mouse.y, world.light.z);
 
-        color.setX(intersects[0].face.a, 0.1)
-        color.setY(intersects[0].face.a, 0.5)
-        color.setZ(intersects[0].face.a, 1)
-        
-        color.setX(intersects[0].face.b, 0.1)
-        color.setY(intersects[0].face.b, 0.5)
-        color.setZ(intersects[0].face.b, 1)
-
-        color.setX(intersects[0].face.c, 0.1)
-        color.setY(intersects[0].face.c, 0.5)
-        color.setZ(intersects[0].face.c, 1)
-
-        intersects[0].object.geometry.attributes.color.needsUpdate = true;
-
-        const initialColor = { r: 0, g: 0.19, b: 0.4 }
-        const hoverColor = { r: 0.1, g: 0.5, b: 1 }
-      
-    
-        gsap.to(hoverColor, {
-            r: initialColor.r,
-            g: initialColor.g,
-            b: initialColor.b,
-            duration: 1,
-            onUpdate: () => {
-                color.setX(intersects[0].face.a, hoverColor.r)
-                color.setY(intersects[0].face.a, hoverColor.g)
-                color.setZ(intersects[0].face.a, hoverColor.b)
-        
-                color.setX(intersects[0].face.b, hoverColor.r)
-                color.setY(intersects[0].face.b, hoverColor.g)
-                color.setZ(intersects[0].face.b, hoverColor.b)
-        
-                color.setX(intersects[0].face.c, hoverColor.r)
-                color.setY(intersects[0].face.c, hoverColor.g)
-                color.setZ(intersects[0].face.c, hoverColor.b)
-                color.needsUpdate = true
-            }
-        })
-    }
+    renderer.render(scene, camera)
 }
 
 window.addEventListener('resize', () => {
@@ -183,8 +143,9 @@ window.addEventListener('resize', () => {
 }, false);
 
 window.addEventListener('mousemove', (event) => {
-    mouse.x = (event.clientX / innerWidth) * 2 - 1
-    mouse.y = - (event.clientY / innerHeight) * 2 + 1
+    var threshold = 0.105;
+    mouse.x = (event.clientX - (window.innerWidth / 2)) * threshold
+    mouse.y = ((window.innerHeight / 2) - event.clientY) * threshold
 }, false);
 
 animate();
