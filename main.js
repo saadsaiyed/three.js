@@ -1,6 +1,6 @@
 import './style.css'
 import { BufferAttribute, DoubleSide, FlatShading, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, WebGLRenderer } from 'three';
-
+import { AbsoluteOrientationSensor, RelativeOrientationSensor } from '/sensor-polyfills/motion-sensors.js';
 
 //Initiate scene - START
     const world = {
@@ -133,43 +133,85 @@ window.addEventListener('resize', () => {
 }, false);
 
 window.addEventListener('mousemove', (event) => {
-    if (window.DeviceMotionEvent == undefined) {
+    if (!navigator.userAgentData.mobile) {
         var threshold = 0.105;
         mouse.x = (event.clientX - (window.innerWidth / 2)) * threshold
         mouse.y = ((window.innerHeight / 2) - event.clientY) * threshold
     }
 }, false);
-window.addEventListener('devicemotion', (event) => {
-    if (window.DeviceMotionEvent != undefined) {
-        var x = 0, y = 0,
-            vx = 0, vy = 0,
-            ax = 0, ay = 0;
 
-        window.ondevicemotion = function (e) {
-            ax = event.accelerationIncludingGravity.x * 5;
-            ay = event.accelerationIncludingGravity.y * 5;
-            console.log(ax, ay);
-        }
-        // setInterval(function() {
-        //     var landscapeOrientation = window.innerWidth / window.innerHeight > 1;
-        //     if (landscapeOrientation) {
-        //         vx = vx + ay;
-        //         vy = vy + ax;
-        //     } else {
-        //         vy = vy - ay;
-        //         vx = vx + ax;
-        //     }
-        //     vx = vx * 0.98;
-        //     vy = vy * 0.98;
-        //     y = parseInt(y + vy / 50);
-        //     x = parseInt(x + vx / 50);
+if (window.DeviceOrientationEvent){
 
-        //     boundingBoxCheck();
+    document.getElementById("tester").innerHTML = "here";
+}
+window.addEventListener('deviceorientation', (event) => {
+    document.getElementById("tester").innerHTML = "here";
+    console.log(event);
+    // if (navigator.userAgentData.mobile) {
+    //     var x = 0, y = 0,
+    //         vx = 0, vy = 0,
+    //         ax = 0, ay = 0;
 
-        //     pointLight.position.set(x, y, world.light.z);
-        // }, 25);
+    //     window.ondevicemotion = function (e) {
+    //         ax = event.accelerationIncludingGravity.x * 5;
+    //         ay = event.accelerationIncludingGravity.y * 5;
+    //         console.log(ax, ay);
+    //     }
+    //     // setInterval(function() {
+    //     //     var landscapeOrientation = window.innerWidth / window.innerHeight > 1;
+    //     //     if (landscapeOrientation) {
+    //     //         vx = vx + ay;
+    //     //         vy = vy + ax;
+    //     //     } else {
+    //     //         vy = vy - ay;
+    //     //         vx = vx + ax;
+    //     //     }
+    //     //     vx = vx * 0.98;
+    //     //     vy = vy * 0.98;
+    //     //     y = parseInt(y + vy / 50);
+    //     //     x = parseInt(x + vx / 50);
+
+    //     //     boundingBoxCheck();
+
+    //     //     pointLight.position.set(x, y, world.light.z);
+    //     // }, 25);
+    // }
+});
+
+let sensor;
+if (navigator.permissions) {
+    // https://w3c.github.io/orientation-sensor/#model
+    Promise.all([navigator.permissions.query({ name: "accelerometer" }),
+                 navigator.permissions.query({ name: "magnetometer" }),
+                 navigator.permissions.query({ name: "gyroscope" })])
+           .then(results => {
+                if (results.every(result => result.state === "granted")) {
+                    initSensor();
+                } else {
+                    document.getElementById('tester').innerHTML = "Permission to use sensor was denied.";
+                }
+           }).catch(err => {
+                document.getElementById('tester').innerHTML = "Integration with Permissions API is not enabled, still try to start app.";
+                initSensor();
+           });
+} else {
+    document.getElementById('tester').innerHTML = "No Permissions API, still try to start app.";
+    initSensor();
+}
+
+function initSensor() {
+    const options = { frequency: 60, coordinateSystem };
+    console.log(JSON.stringify(options));
+    sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options);
+    sensor.onreading = () => document.getElementById('tester').innerHTML = "It worked"
+    sensor.onerror = (event) => {
+        document.getElementById('tester').innerHTML = event.error.name;
+      if (event.error.name == 'NotReadableError') {
+        document.getElementById('tester').innerHTML = "Sensor is not available.";
+      }
     }
-}, false);
+    sensor.start();
+}
 
 
 animate();
