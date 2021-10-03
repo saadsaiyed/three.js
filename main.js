@@ -87,7 +87,7 @@ function generatePlane() {
                 
                 array[i] = x + (Math.random() - 0.5) * 3
                 array[i+1] = y + (Math.random() - 0.5) * 3
-                array[i + 2] = z +(Math.random() - 0.5) * 5
+                array[i + 2] = z + (Math.random() - 0.5) * 5
             }
             
             randomValues.push(Math.random() * Math.PI * 2)
@@ -133,9 +133,43 @@ window.addEventListener('resize', () => {
 }, false);
 
 window.addEventListener('mousemove', (event) => {
-    var threshold = 0.105;
-    mouse.x = (event.clientX - (window.innerWidth / 2)) * threshold
-    mouse.y = ((window.innerHeight / 2) - event.clientY) * threshold
+    if (window.DeviceMotionEvent == undefined) {
+        var threshold = 0.105;
+        mouse.x = (event.clientX - (window.innerWidth / 2)) * threshold
+        mouse.y = ((window.innerHeight / 2) - event.clientY) * threshold
+    }
 }, false);
+window.addEventListener('devicemotion', (event) => {
+    if (window.DeviceMotionEvent != undefined) {
+        var x = 0, y = 0,
+            vx = 0, vy = 0,
+            ax = 0, ay = 0;
+
+        window.ondevicemotion = function (e) {
+            ax = event.accelerationIncludingGravity.x * 5;
+            ay = event.accelerationIncludingGravity.y * 5;
+            console.log(ax, ay);
+        }
+        // setInterval(function() {
+        //     var landscapeOrientation = window.innerWidth / window.innerHeight > 1;
+        //     if (landscapeOrientation) {
+        //         vx = vx + ay;
+        //         vy = vy + ax;
+        //     } else {
+        //         vy = vy - ay;
+        //         vx = vx + ax;
+        //     }
+        //     vx = vx * 0.98;
+        //     vy = vy * 0.98;
+        //     y = parseInt(y + vy / 50);
+        //     x = parseInt(x + vx / 50);
+
+        //     boundingBoxCheck();
+
+        //     pointLight.position.set(x, y, world.light.z);
+        // }, 25);
+    }
+}, false);
+
 
 animate();
