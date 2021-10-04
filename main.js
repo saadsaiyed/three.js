@@ -1,19 +1,19 @@
 import './style.css'
-import { BufferAttribute, DoubleSide, FlatShading, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, WebGLRenderer } from 'three';
-import { AbsoluteOrientationSensor, RelativeOrientationSensor } from '/sensor-polyfills/motion-sensors.js';
+import { BufferAttribute, DirectionalLight, DirectionalLightHelper, DoubleSide, FlatShading, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector3, WebGLRenderer } from 'three';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 
 //Initiate scene - START
     const world = {
-        plane: {
-            width: 400,
-            height: 400,
-            widthSegments: 50,
-            heightSegments: 50
+        sphere: {
+            radius: 30,
+            widthSegments: 16,
+            heightSegments: 8,
+            position: new Vector3(0,0,0)
         },
         light: {
             x: 0,
             y: 0,
-            z: 10,
+            z: 50,
             color: 0x55ff99,
             intensity: 2
         }
@@ -34,94 +34,92 @@ import { AbsoluteOrientationSensor, RelativeOrientationSensor } from '/sensor-po
     renderer.setPixelRatio(devicePixelRatio);
     document.body.appendChild(renderer.domElement);
     
-    const plane = new Mesh(
-        new PlaneGeometry(
-            world.plane.width,
-            world.plane.height,
-            world.plane.widthSegments,
-            world.plane.heightSegments
-        ),    
-        new MeshPhongMaterial({
-            side: DoubleSide,
-            flatShading: FlatShading,
-            vertexColors: true
-        })
-    );
-    scene.add(plane);
-    generatePlane();
-    
-    //Lighting - START
-        const pointLight = new PointLight(world.light.color, world.light.intensity, 100)
-        pointLight.position.set(
-            world.light.x,
-            world.light.y,
-            world.light.z
-        );
-        scene.add(pointLight);
-    //Lighting - END
+    new OrbitControls(camera, renderer.domElement);
 
-    const mouse = {
-        x: 0,
-        y: 0
-    }
+    //Sphere - START
+        const sphere = new Mesh(
+            new SphereGeometry(
+                world.sphere.radius,
+                world.sphere.widthSegments,
+                world.sphere.heightSegments
+            ),
+            new MeshPhongMaterial({
+                flatShading: FlatShading,
+                vertexColors: true    
+            })
+        );
+        sphere.position.copy(world.sphere.position)
+        generatePlane();
+        scene.add(sphere);
+    //Sphere - END
+
+    //Lighting - START
+        
+        const directionalLightTop = new DirectionalLight( 0xFFFFFF, 2);
+        directionalLightTop.position.set(-10, 10, 20);
+        const directionalLightBottom = new DirectionalLight( 0xFFFFFF, 2);
+        directionalLightBottom.position.set(10, -10, -20);
+        scene.add( directionalLightTop );
+        scene.add( directionalLightBottom );
+
+    //Lighting - END
 
 //Initiate scene - END
 
 function generatePlane() {
-    plane.geometry.dispose();
-    plane.geometry = new PlaneGeometry(
-        world.plane.width,
-        world.plane.height,
-        world.plane.widthSegments,
-        world.plane.heightSegments
+    sphere.geometry.dispose();
+    new SphereGeometry(
+        world.sphere.radius,
+        world.sphere.widthSegments,
+        world.sphere.heightSegments
     )
-    
     // Adding vertices - START
         const randomValues = [];
-        const { array } = plane.geometry.attributes.position;
+        const { array } = sphere.geometry.attributes.position;
         for (let i = 0; i < array.length; i++) {
             if (i % 3 == 0) {
                 const x = array[i]        
                 const y = array[i+1]        
                 const z = array[i+2]        
                 
-                array[i] = x + (Math.random() - 0.5) * 3
-                array[i+1] = y + (Math.random() - 0.5) * 3
-                array[i + 2] = z + (Math.random() - 0.5) * 5
+                if (Math.abs(y) != world.sphere.radius) {
+                    array[i] = x + (Math.random() - 0.5) * 3
+                    array[i + 1] = y + (Math.random() - 0.5) * 3;
+                    array[i + 2] = z + (Math.random() - 0.5) * 3
+                }
             }
-            
             randomValues.push(Math.random() * Math.PI * 2)
         }
-        plane.geometry.attributes.position.originalPosition = plane.geometry.attributes.position.array
-        plane.geometry.attributes.position.randomValues = randomValues
+        sphere.geometry.attributes.position.originalPosition = sphere.geometry.attributes.position.array
+        sphere.geometry.attributes.position.randomValues = randomValues
     // Adding vertices - END
 
     // Vertices Coloring - START
         const colors = []
-        for (let i = 0; i < plane.geometry.attributes.position.count; i++) {
+        for (let i = 0; i < sphere.geometry.attributes.position.count; i++) {
             colors.push(0, 0.19, 0.4)
         }
-        plane.geometry.setAttribute('color', new BufferAttribute(new Float32Array(colors), 3));
+        sphere.geometry.setAttribute('color', new BufferAttribute(new Float32Array(colors), 3));
     // Vertices Coloring - END
 }
 
-let frame = 0 
+var frame = 0;
 function animate() {
     //perform an animation and requests that the browser calls a specified function to update an animation before the next repaint
     requestAnimationFrame(animate);
-    frame += 0.01;
-
-    //Moving plane with individual vertices - START
-        const {array, originalPosition, randomValues} = plane.geometry.attributes.position
+    frame += 0.07;
+    //Moving sphere with individual vertices - START
+        const {array, originalPosition, randomValues} = sphere.geometry.attributes.position
         for (let i = 0; i < array.length; i+=3) {
-            array[i] = originalPosition[i] + Math.cos(frame + randomValues[i]) * 0.01
-            array[i+1] = originalPosition[i+1] + Math.sin(frame + randomValues[i]) * 0.01
+            if (Math.abs(array[i+1]) != world.sphere.radius) {
+                array[i] = originalPosition[i] + Math.cos(frame + randomValues[i]) * 0.01
+                array[i+1] = originalPosition[i+1] + Math.sin(frame + randomValues[i]) * 0.01
+                array[i+2] = originalPosition[i+2] + Math.sin(frame + randomValues[i]) * 0.01
+            }
         }
-        plane.geometry.attributes.position.needsUpdate = true;
-    //Moving plane with individual vertices - END
+        sphere.geometry.attributes.position.needsUpdate = true;
+    //Moving sphere with individual vertices - END
 
-    //Updating light position relative to mouse position
-    pointLight.position.set(mouse.x , mouse.y, world.light.z);
 
     renderer.render(scene, camera)
 }
@@ -131,87 +129,5 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }, false);
-
-window.addEventListener('mousemove', (event) => {
-    if (!navigator.userAgentData.mobile) {
-        var threshold = 0.105;
-        mouse.x = (event.clientX - (window.innerWidth / 2)) * threshold
-        mouse.y = ((window.innerHeight / 2) - event.clientY) * threshold
-    }
-}, false);
-
-if (window.DeviceOrientationEvent){
-
-    document.getElementById("tester").innerHTML = "here";
-}
-window.addEventListener('deviceorientation', (event) => {
-    document.getElementById("tester").innerHTML = "here";
-    console.log(event);
-    // if (navigator.userAgentData.mobile) {
-    //     var x = 0, y = 0,
-    //         vx = 0, vy = 0,
-    //         ax = 0, ay = 0;
-
-    //     window.ondevicemotion = function (e) {
-    //         ax = event.accelerationIncludingGravity.x * 5;
-    //         ay = event.accelerationIncludingGravity.y * 5;
-    //         console.log(ax, ay);
-    //     }
-    //     // setInterval(function() {
-    //     //     var landscapeOrientation = window.innerWidth / window.innerHeight > 1;
-    //     //     if (landscapeOrientation) {
-    //     //         vx = vx + ay;
-    //     //         vy = vy + ax;
-    //     //     } else {
-    //     //         vy = vy - ay;
-    //     //         vx = vx + ax;
-    //     //     }
-    //     //     vx = vx * 0.98;
-    //     //     vy = vy * 0.98;
-    //     //     y = parseInt(y + vy / 50);
-    //     //     x = parseInt(x + vx / 50);
-
-    //     //     boundingBoxCheck();
-
-    //     //     pointLight.position.set(x, y, world.light.z);
-    //     // }, 25);
-    // }
-});
-
-let sensor;
-if (navigator.permissions) {
-    // https://w3c.github.io/orientation-sensor/#model
-    Promise.all([navigator.permissions.query({ name: "accelerometer" }),
-                 navigator.permissions.query({ name: "magnetometer" }),
-                 navigator.permissions.query({ name: "gyroscope" })])
-           .then(results => {
-                if (results.every(result => result.state === "granted")) {
-                    initSensor();
-                } else {
-                    document.getElementById('tester').innerHTML = "Permission to use sensor was denied.";
-                }
-           }).catch(err => {
-                document.getElementById('tester').innerHTML = "Integration with Permissions API is not enabled, still try to start app.";
-                initSensor();
-           });
-} else {
-    document.getElementById('tester').innerHTML = "No Permissions API, still try to start app.";
-    initSensor();
-}
-
-function initSensor() {
-    const options = { frequency: 60, coordinateSystem };
-    console.log(JSON.stringify(options));
-    sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options);
-    sensor.onreading = () => document.getElementById('tester').innerHTML = "It worked"
-    sensor.onerror = (event) => {
-        document.getElementById('tester').innerHTML = event.error.name;
-      if (event.error.name == 'NotReadableError') {
-        document.getElementById('tester').innerHTML = "Sensor is not available.";
-      }
-    }
-    sensor.start();
-}
-
 
 animate();
