@@ -1,12 +1,12 @@
 import './style.css'
-import { BufferAttribute, DirectionalLight, DirectionalLightHelper, DoubleSide, FlatShading, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector3, WebGLRenderer } from 'three';
+import { AxesHelper, BufferAttribute, DirectionalLight, DirectionalLightHelper, DoubleSide, FlatShading, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector3, WebGLRenderer } from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 
 //Initiate scene - START
     const world = {
         sphere: {
             radius: 30,
-            widthSegments: 16,
+            widthSegments:  16,
             heightSegments: 8,
             position: new Vector3(0,0,0)
         },
@@ -45,7 +45,7 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
             ),
             new MeshPhongMaterial({
                 flatShading: FlatShading,
-                vertexColors: true    
+                vertexColors: true,
             })
         );
         sphere.position.copy(world.sphere.position)
@@ -54,15 +54,25 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
     //Sphere - END
 
     //Lighting - START
-        
-        const directionalLightTop = new DirectionalLight( 0xFFFFFF, 2);
-        directionalLightTop.position.set(-10, 10, 20);
-        const directionalLightBottom = new DirectionalLight( 0xFFFFFF, 2);
-        directionalLightBottom.position.set(10, -10, -20);
+        const directionalLightTop = new DirectionalLight( 0xFFFFFF, 1);
         scene.add( directionalLightTop );
-        scene.add( directionalLightBottom );
+        directionalLightTop.position.set(0, 10, 10);
 
+        const tempLight1 = new DirectionalLight( 0xFFFFFF, 1);
+        tempLight1.position.set(0, -10, -10);
+        scene.add( tempLight1 );
+        
+        const tempLight2 = new DirectionalLight( 0xFFFFFF, 1);
+        tempLight2.position.set(10, 0, -10);
+        scene.add( tempLight2 );
+        
+        const tempLight3 = new DirectionalLight( 0xFFFFFF, 1);
+        tempLight3.position.set(-10, 0, 10);
+        scene.add( tempLight3 );
     //Lighting - END
+
+    const axesHelper = new AxesHelper( 500 );
+    scene.add( axesHelper );
 
 //Initiate scene - END
 
@@ -81,8 +91,9 @@ function generatePlane() {
                 const x = array[i]        
                 const y = array[i+1]        
                 const z = array[i+2]        
-                
-                if (Math.abs(y) != world.sphere.radius) {
+                if ((Math.abs(array[i + 1]) == world.sphere.radius) || (i % 17 == 0) || ((i + 3) % 17 == 0) ) {
+                }
+                else {
                     array[i] = x + (Math.random() - 0.5) * 3
                     array[i + 1] = y + (Math.random() - 0.5) * 3;
                     array[i + 2] = z + (Math.random() - 0.5) * 3
@@ -111,7 +122,14 @@ function animate() {
     //Moving sphere with individual vertices - START
         const {array, originalPosition, randomValues} = sphere.geometry.attributes.position
         for (let i = 0; i < array.length; i+=3) {
-            if (Math.abs(array[i+1]) != world.sphere.radius) {
+
+            if ((Math.abs(array[i + 1]) == world.sphere.radius)) {}
+            else if ((i % 17 == 0) || ((i + 3) % 17 == 0)) {
+                array[i] = originalPosition[i] + Math.cos(frame + randomValues[0]) * 0.01
+                array[i+1] = originalPosition[i+1] + Math.sin(frame + randomValues[1]) * 0.01
+                array[i+2] = originalPosition[i+2] + Math.sin(frame + randomValues[2]) * 0.01
+            }
+            else {
                 array[i] = originalPosition[i] + Math.cos(frame + randomValues[i]) * 0.01
                 array[i+1] = originalPosition[i+1] + Math.sin(frame + randomValues[i]) * 0.01
                 array[i+2] = originalPosition[i+2] + Math.sin(frame + randomValues[i]) * 0.01
