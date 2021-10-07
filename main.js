@@ -137,7 +137,7 @@ function animate() {
         sphere.geometry.attributes.position.needsUpdate = true;
     //Moving sphere with individual vertices - END
 
-    sphere.rotation.y += 0.005;
+    sphere.rotation.y += 0.004;
 
     renderer.render(scene, camera)
 }
