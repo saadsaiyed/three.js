@@ -122,6 +122,7 @@ function animate() {
 
     //Updating light position relative to mouse position
     pointLight.position.set(mouse.x , mouse.y, world.light.z);
+    sphere.rotation.y += 0.004;
 
     renderer.render(scene, camera)
 }
