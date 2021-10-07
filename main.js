@@ -49,7 +49,7 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
             })
         );
         sphere.position.copy(world.sphere.position)
-        generatePlane();
+        generateSphere();
         scene.add(sphere);
     //Sphere - END
 
@@ -71,12 +71,13 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
         scene.add( tempLight3 );
     //Lighting - END
 
-    const axesHelper = new AxesHelper( 500 );
-    scene.add( axesHelper );
-
+    //Axis Helper - START
+        // scene.add( new AxesHelper( 500 ) );
+    //Axis Helper - END
+    
 //Initiate scene - END
 
-function generatePlane() {
+function generateSphere() {
     sphere.geometry.dispose();
     new SphereGeometry(
         world.sphere.radius,
@@ -116,13 +117,11 @@ function generatePlane() {
 
 var frame = 0;
 function animate() {
-    //perform an animation and requests that the browser calls a specified function to update an animation before the next repaint
     requestAnimationFrame(animate);
     frame += 0.07;
     //Moving sphere with individual vertices - START
         const {array, originalPosition, randomValues} = sphere.geometry.attributes.position
         for (let i = 0; i < array.length; i+=3) {
-
             if ((Math.abs(array[i + 1]) == world.sphere.radius)) {}
             else if ((i % 17 == 0) || ((i + 3) % 17 == 0)) {
                 array[i] = originalPosition[i] + Math.cos(frame + randomValues[0]) * 0.01
@@ -138,6 +137,7 @@ function animate() {
         sphere.geometry.attributes.position.needsUpdate = true;
     //Moving sphere with individual vertices - END
 
+    sphere.rotation.y += 0.005;
 
     renderer.render(scene, camera)
 }
