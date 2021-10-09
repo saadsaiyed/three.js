@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Accelerometer</title>
+    <meta name="viewport" content="width=device-width,user-scalable=yes" />
+    <style>
+        .shape {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            -webkit-radius: 50px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #sphere1 {
+            border-radius: 50px;
+            background-color: blue;
+        }
+        
+        #sphere2 {
+            background-color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="content">
+        <div class="shape" id="sphere1"></div>
+        <div>some text or other html</div>
+    </div>
+    <script type="text/javascript">
+        var x1 = 0,
+            y1 = 0,
+            vx1 = 0,
+            vy1 = 0,
+            ax1 = 0,
+            ay1 = 0;
+
+
+        var sphere1 = document.getElementById("sphere1");
+
+        if (window.DeviceMotionEvent != undefined) {
+            window.ondevicemotion = function(e) {
+                ax1 = event.accelerationIncludingGravity.x * 5;
+                ay1 = event.accelerationIncludingGravity.y * 5;
+            }
+            setInterval(function() {
+                var landscapeOrientation = window.innerWidth / window.innerHeight > 1;
+                if (landscapeOrientation) {
+                    vx1 = vx1 + ay1;
+                    vy1 = vy1 + ax1;
+                } else {
+                    vy1 = vy1 - ay1;
+                    vx1 = vx1 + ax1;
+                }
+                vx1 = vx1 * 0.98;
+                vy1 = vy1 * 0.98;
+                y1 = parseInt(y1 + vy1 / 50);
+                x1 = parseInt(x1 + vx1 / 50);
+
+                boundingBoxCheck();
+
+                sphere1.style.top = y1 + "px";
+                sphere1.style.left = x1 + "px";
+
+            }, 25);
+        }
+
+        function boundingBoxCheck() {
+            if (x1 < 0) {
+                x1 = 0;
+                vx1 = -vx1;
+            }
+            if (y1 < 0) {
+                y1 = 0;
+                vy1 = -vy1;
+            }
+            if (x1 > document.documentElement.clientWidth - 50) {
+                x1 = document.documentElement.clientWidth - 50;
+                vx1 = -vx1;
+            }
+            if (y1 > document.documentElement.clientHeight - 50) {
+                y1 = document.documentElement.clientHeight - 50;
+                vy1 = -vy1;
+            }
+        }
+    </script>
+</body>
+
+</html>
