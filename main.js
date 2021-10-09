@@ -1,20 +1,20 @@
 import './style.css'
 import { AxesHelper, BufferAttribute, DirectionalLight, DirectionalLightHelper, DoubleSide, FlatShading, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector3, WebGLRenderer } from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
+import gsap from 'gsap';
 
 //Initiate scene - START
     const world = {
         plane: {
             width: 400,
-            height: 400,
+            height: 600,
             widthSegments: 50,
             heightSegments: 50
         },
         sphere: {
-            radius: 15,
-            widthSegments:  16,
-            heightSegments: 8,
-            position: new Vector3(0,0,0)
+            radius: 30,
+            widthSegments:  32,
+            heightSegments: 16
         },
         light: {
             x: 0,
@@ -25,7 +25,6 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
         }
     }
 
-    world.sphere.position.setY(-(world.plane.height/2 + world.sphere.radius));
     const scene = new Scene();
 
     const camera = new PerspectiveCamera(
@@ -34,14 +33,14 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
         0.1,
         1000
     );
-    camera.position.z = 70;
+    camera.position.z = 90;
 
     const renderer = new WebGLRenderer({antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(devicePixelRatio);
     document.body.appendChild(renderer.domElement);
     
-    const controls = new OrbitControls( camera, renderer.domElement );
+    // const controls = new OrbitControls( camera, renderer.domElement );
 
     //Plane - START
         const plane = new Mesh(
@@ -51,12 +50,13 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
                 world.plane.widthSegments,
                 world.plane.heightSegments
                 ),    
-                new MeshPhongMaterial({
-                    side: DoubleSide,
-                    flatShading: FlatShading,
-                    vertexColors: true
-                })
-            );
+            new MeshPhongMaterial({
+                side: DoubleSide,
+                flatShading: FlatShading,
+                vertexColors: true
+            })
+        );
+        plane.position.y = 80-world.plane.height / 2;
         scene.add(plane);
         generatePlane();
     //Plane - END
@@ -71,9 +71,13 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
             new MeshPhongMaterial({
                 flatShading: FlatShading,
                 vertexColors: true,
+                side: DoubleSide
             })
         );
-        sphere.position.copy(world.sphere.position)
+        sphere.position.setY(-(world.plane.height + world.sphere.radius));
+        sphere.position.setZ(world.sphere.radius);
+        sphere.rotation.z += Math.PI / 2;
+        sphere.rotation.x += Math.PI;
         generateSphere();
         scene.add(sphere);
     //Sphere - END
@@ -156,7 +160,7 @@ function generatePlane() {
 
 function generateSphere() {
     sphere.geometry.dispose();
-    new SphereGeometry(
+    sphere.geometry = new SphereGeometry(
         world.sphere.radius,
         world.sphere.widthSegments,
         world.sphere.heightSegments
@@ -169,7 +173,7 @@ function generateSphere() {
                 const x = array[i]        
                 const y = array[i+1]        
                 const z = array[i+2]        
-                if ((Math.abs(array[i + 1]) == world.sphere.radius) || (i % 17 == 0) || ((i + 3) % 17 == 0) ) {
+                if ((Math.abs(array[i + 1]) == world.sphere.radius) || (i % (world.sphere.radius+1) == 0) || ((i + 3) % (world.sphere.radius+1) == 0) ) {
                 }
                 else {
                     array[i] = x + (Math.random() - 0.5) * 3
@@ -228,9 +232,9 @@ function animate() {
 
     //Updating light position relative to mouse position
     pointLight.position.set(mouse.x , mouse.y, world.light.z);
-    sphere.rotation.y += 0.005;
+    sphere.rotation.x -= 0.005;
 
-    controls.update()
+    //controls.update()
     renderer.render(scene, camera)
 }
 
@@ -245,5 +249,26 @@ window.addEventListener('mousemove', (event) => {
     mouse.x = (event.clientX - (window.innerWidth / 2)) * threshold
     mouse.y = ((window.innerHeight / 2) - event.clientY) * threshold
 }, false);
+
+document.getElementById("portfolio").addEventListener('click', (event) => {
+    console.log("clicked");
+    let tempCameraZoomValue = 20;
+    gsap.to(camera.position, {
+        y: sphere.position.y,
+        duration: 3,
+        ease: "power4",
+        onStart: () => {
+            gsap.to(camera.position, {
+                z: camera.position.z - tempCameraZoomValue
+            })
+        },
+        onComplete: () => {
+            gsap.to(camera.position, {
+                z: camera.position.z + tempCameraZoomValue,
+                duration: 5
+            })
+        }
+    })
+});
 
 animate();
