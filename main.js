@@ -1,7 +1,12 @@
 import './style.css'
 import { AxesHelper, BufferAttribute, DirectionalLight, DirectionalLightHelper, DoubleSide, FlatShading, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector3, WebGLRenderer } from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
+import {FontLoader} from 'three/examples/jsm/loaders/FontLoader'
+import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry'
 import gsap from 'gsap';
+import * as dat from 'dat.gui'
+
+const gui = new dat.GUI();
 
 //Initiate scene - START
     const world = {
@@ -9,21 +14,21 @@ import gsap from 'gsap';
             width: 400,
             height: 600,
             widthSegments: 50,
-            heightSegments: 50
+            heightSegments: 50,
+            position: new Vector3(0, 0, 0)
         },
         sphere: {
             radius: 30,
             widthSegments:  32,
-            heightSegments: 16
+            heightSegments: 16,
+            position: new Vector3(0, 0, 0)
         },
-        light: {
-            x: 0,
-            y: 0,
-            z: 10,
+        pointLight: {
             color: 0x55ff99,
-            intensity: 2
+            intensity: 2,
+            position: new Vector3(0, 0, 10)
         }
-    }
+    }    
 
     const scene = new Scene();
 
@@ -56,9 +61,23 @@ import gsap from 'gsap';
                 vertexColors: true
             })
         );
-        plane.position.y = 80-world.plane.height / 2;
+        world.plane.position.setY(80-world.plane.height / 2);
+        plane.position.y = world.plane.position.y;
         scene.add(plane);
+        console.log(plane);
         generatePlane();
+        
+        var GUIPlane = gui.addFolder('Plane'); 
+        GUIPlane.add(plane, 'visible')
+        var GUIPlanePosition = GUIPlane.addFolder('Position'); 
+            GUIPlanePosition.add(plane.position, 'x').min(world.plane.position.x - 100).max(world.plane.position.x + 100).step(0.1).name('x')
+            GUIPlanePosition.add(plane.position, 'y').min(world.plane.position.y - 100).max(world.plane.position.y + 100).step(0.1).name('y')
+            GUIPlanePosition.add(plane.position, 'z').min(world.plane.position.z - 100).max(world.plane.position.z + 100).step(0.1).name('z')
+        var GUIPlaneGeometry = GUIPlane.addFolder('Geometry'); 
+            GUIPlaneGeometry.add(world.plane, 'width').min(world.plane.width - 100).max(world.plane.width + 100).step(1).name('width').onChange(generatePlane)
+            GUIPlaneGeometry.add(world.plane, 'height').min(world.plane.height - 100).max(world.plane.height + 100).step(1).name('height').onChange(generatePlane)
+            GUIPlaneGeometry.add(world.plane, 'widthSegments').min(world.plane.widthSegments - 100).max(world.plane.widthSegments + 100).step(1).name('widthSegments').onChange(generatePlane)
+            GUIPlaneGeometry.add(world.plane, 'heightSegments').min(world.plane.heightSegments - 100).max(world.plane.heightSegments + 100).step(1).name('heightSegments').onChange(generatePlane)
     //Plane - END
             
     //Sphere - START
@@ -74,21 +93,57 @@ import gsap from 'gsap';
                 side: DoubleSide
             })
         );
-        sphere.position.setY(-(world.plane.height + world.sphere.radius));
-        sphere.position.setZ(world.sphere.radius);
+        world.sphere.position.set(sphere.position.x, -(world.plane.height + world.sphere.radius), world.sphere.radius);
+        sphere.position.copy(world.sphere.position);
         sphere.rotation.z += Math.PI / 2;
         sphere.rotation.x += Math.PI;
-        generateSphere();
         scene.add(sphere);
+        generateSphere();
+        
+        var GUISphere = gui.addFolder('Sphere'); 
+        var GUISpherePosition = GUISphere.addFolder('Position'); 
+            GUISpherePosition.add(sphere.position, 'x').min(world.sphere.position.x - 100).max(world.sphere.position.x + 100).step(0.1).name('x')
+            GUISpherePosition.add(sphere.position, 'y').min(world.sphere.position.y - 100).max(world.sphere.position.y + 100).step(0.1).name('y')
+            GUISpherePosition.add(sphere.position, 'z').min(world.sphere.position.z - 100).max(world.sphere.position.z + 100).step(0.1).name('z')
+        var GUISphereGeometry = GUISphere.addFolder('Geometry'); 
+            GUISphereGeometry.add(world.sphere, 'radius').min(world.sphere.radius - 100).max(world.sphere.radius + 100).step(1).name('radius').onChange(generateSphere)
+            GUISphereGeometry.add(world.sphere, 'widthSegments').min(world.sphere.widthSegments - 100).max(world.sphere.widthSegments + 100).step(1).name('widthSegments').onChange(generateSphere)
+            GUISphereGeometry.add(world.sphere, 'heightSegments').min(world.sphere.heightSegments - 100).max(world.sphere.heightSegments + 100).step(1).name('heightSegments').onChange(generateSphere)
     //Sphere - END
 
-    
+    //Text - START
+        // const fontLoader = new FontLoader();
+        // fontLoader.load( 'static/fonts/helvetiker_regular.typeface.json', function ( font ) {
+
+        //     const text = new Mesh(
+        //         new TextGeometry('Hello three.js!', {
+        //             font: font,
+        //             size: 10,
+        //             height: 1,
+        //             curveSegments: 2,
+        //             bevelEnabled: true,
+        //             bevelThickness: 1,
+        //             bevelSize: 1,
+        //             bevelOffset: 0,
+        //             bevelSegments: 1
+        //         }),
+        //         new MeshPhongMaterial({
+        //             flatShading: FlatShading,
+        //             vertexColors: true,
+        //             side: DoubleSide
+        //         })
+        //     );
+        //     scene.add(text)
+        // } );
+        
+    //Text - END
+
     //Lighting - START
-        const pointLight = new PointLight(world.light.color, world.light.intensity, 100)
+        const pointLight = new PointLight(world.pointLight.color, world.pointLight.intensity, 100)
         pointLight.position.set(
-            world.light.x,
-            world.light.y,
-            world.light.z
+            world.pointLight.position.x,
+            world.pointLight.position.y,
+            world.pointLight.position.z
         );
         scene.add(pointLight);
         
@@ -97,16 +152,17 @@ import gsap from 'gsap';
         directionalLightTop.position.set(0, 10, 10);
 
         const tempLight1 = new DirectionalLight( 0xFFFFFF, 1);
-        tempLight1.position.set(0, -10, -10);
+        tempLight1.position.set(10, 10, 10);
         scene.add( tempLight1 );
         
-        const tempLight2 = new DirectionalLight( 0xFFFFFF, 1);
-        tempLight2.position.set(10, 0, -10);
-        scene.add( tempLight2 );
+        // const tempLight2 = new DirectionalLight( 0xFFFFFF, 1);
+        // tempLight2.position.set(10, 0, -10);
+        // scene.add( tempLight2 );
         
-        const tempLight3 = new DirectionalLight( 0xFFFFFF, 1);
-        tempLight3.position.set(-10, 0, 10);
-        scene.add( tempLight3 );
+        // const tempLight3 = new DirectionalLight( 0xFFFFFF, 1);
+        // tempLight3.position.set(-10, 0, 10);
+        // scene.add( tempLight3 );
+
     //Lighting - END
 
     //Axis Helper - START
@@ -119,6 +175,16 @@ import gsap from 'gsap';
     }
 
 //Initiate scene - END
+
+//GUI Settings - START
+    // GUIPlane.open();
+    GUIPlanePosition.open();
+    GUIPlaneGeometry.open();
+
+    // GUISphere.open();
+    GUISpherePosition.open();
+    GUISphereGeometry.open();
+//GUI Settings - END
 
 function generatePlane() {
     plane.geometry.dispose();
@@ -231,7 +297,7 @@ function animate() {
     //Moving Sphere with individual vertices - END
 
     //Updating light position relative to mouse position
-    pointLight.position.set(mouse.x , mouse.y, world.light.z);
+    pointLight.position.set(mouse.x , mouse.y, world.pointLight.z);
     sphere.rotation.x -= 0.005;
 
     //controls.update()
@@ -251,7 +317,6 @@ window.addEventListener('mousemove', (event) => {
 }, false);
 
 document.getElementById("portfolio").addEventListener('click', (event) => {
-    console.log("clicked");
     let tempCameraZoomValue = 20;
     gsap.to(camera.position, {
         y: sphere.position.y,
@@ -269,6 +334,9 @@ document.getElementById("portfolio").addEventListener('click', (event) => {
             })
         }
     })
+
+    document.querySelector("#intro").classList.add("hidden");
+    document.querySelector("#work").classList.remove("hidden");
 });
 
 animate();
