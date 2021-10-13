@@ -177,6 +177,8 @@ const gui = new dat.GUI();
 //Initiate scene - END
 
 //GUI Settings - START
+    gui.__proto__.constructor.toggleHide()
+
     // GUIPlane.open();
     GUIPlanePosition.open();
     GUIPlaneGeometry.open();
