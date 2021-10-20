@@ -1,4 +1,5 @@
 import './style.css'
+import './function.js'
 import { AxesHelper, BufferAttribute, DirectionalLight, DirectionalLightHelper, DoubleSide, FlatShading, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector3, WebGLRenderer } from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import {FontLoader} from 'three/examples/jsm/loaders/FontLoader'
@@ -261,6 +262,8 @@ function generateSphere() {
             colors.push(0.4, 0.19, 0)
         }
         sphere.geometry.setAttribute('color', new BufferAttribute(new Float32Array(colors), 3));
+        console.log(sphere.geometry)
+
     // Vertices Coloring - END
 }
 
@@ -280,19 +283,19 @@ function animate() {
     //Moving plane with individual vertices - END
 
     //Moving Sphere with individual vertices - START
-        frameSphere += 0.07;
+        frameSphere += 0.1;
         var {array, originalPosition, randomValues} = sphere.geometry.attributes.position
         for (let i = 0; i < array.length; i+=3) {
             if ((Math.abs(array[i + 1]) == world.sphere.radius)) {}
             else if ((i % (world.sphere.widthSegments+1) == 0) || ((i + 3) % (world.sphere.widthSegments+1) == 0)) {
-                array[i] = originalPosition[i] + Math.cos(frameSphere + randomValues[0]) * 0.01
-                array[i+1] = originalPosition[i+1] + Math.sin(frameSphere + randomValues[1]) * 0.01
-                array[i+2] = originalPosition[i+2] + Math.sin(frameSphere + randomValues[2]) * 0.01
+                array[i] = originalPosition[i] + Math.cos(frameSphere + randomValues[0]) * 0.05
+                array[i+1] = originalPosition[i+1] + Math.sin(frameSphere + randomValues[1]) * 0.05
+                array[i+2] = originalPosition[i+2] + Math.sin(frameSphere + randomValues[2]) * 0.05
             }
             else {
-                array[i] = originalPosition[i] + Math.cos(frameSphere + randomValues[i]) * 0.01
-                array[i+1] = originalPosition[i+1] + Math.sin(frameSphere + randomValues[i]) * 0.01
-                array[i+2] = originalPosition[i+2] + Math.sin(frameSphere + randomValues[i]) * 0.01
+                array[i] = originalPosition[i] + Math.cos(frameSphere + randomValues[i]) * 0.05
+                array[i+1] = originalPosition[i+1] + Math.sin(frameSphere + randomValues[i]) * 0.05
+                array[i+2] = originalPosition[i+2] + Math.sin(frameSphere + randomValues[i]) * 0.05
             }
         }
         sphere.geometry.attributes.position.needsUpdate = true;
