@@ -51,3 +51,4 @@ npm run dev
 The documentation might not be in much depth but I'm sure the code itself is pretty self explanatory. I've tried using all the industry standard semantics and code organization.
 
 ### File Tree Structure
+...
