@@ -1,18 +1,77 @@
-@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200&family=Ubuntu+Mono&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200&family=Ubuntu+Mono&display=swap");
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    /* display: none; */
 }
 
 body {
     margin: 0;
 }
 
-#container {
-    top: 50%;
+.wave-button {
+    width: 200px;
+    padding: 10px 20px;
+    position: relative;
+    text-decoration: none;
+    overflow: hidden;
+    border-radius: 5% 0% 30% 30%;
+    border: 1px solid transparent;
+}
+
+.wave-button:hover .wave {
+    top: -120px;
+}
+
+.wave-button:hover {
+    border-color: whitesmoke;
+}
+
+.wave-button span {
+    position: relative;
+    z-index: 1;
+    color: white;
+    align-self: center;
+}
+
+.wave-button .wave {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    left: 0;
+    top: -80px;
+    transition: 0.4s;
+}
+
+.wave-button .wave::before,
+.wave-button .wave::after {
+    width: 200%;
+    height: 200%;
+    content: "";
+    position: absolute;
+    top: 0;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -75%);
+}
+
+.wave-button .wave::before {
+    border-radius: 45%;
+    background-color: #55ffc663;
+    animation: wave 5s linear infinite;
+}
+
+.wave-button .wave::after {
+    border-radius: 40%;
+    background-color: #55ffd44d;
+    animation: wave 10s linear infinite;
+}
+
+@keyframes wave {
+    0% {
+        transform: translate(-50%, -75%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -75%) rotate(360deg);
+    }
 }

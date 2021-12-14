@@ -1,7 +1,13 @@
 import './style.css'
-import { AxesHelper, BufferAttribute, DirectionalLight, DirectionalLightHelper, DoubleSide, FlatShading, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector3, WebGLRenderer } from 'three';
+import './function.js'
+import { AxesHelper, BufferAttribute, BufferGeometry, Clock, DirectionalLight, DirectionalLightHelper, DoubleSide, FlatShading, Float32BufferAttribute, Group, MathUtils, Mesh, MeshBasicMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Points, PointsMaterial, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector3, WebGLRenderer } from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
+import {FontLoader} from 'three/examples/jsm/loaders/FontLoader'
+import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry'
 import gsap from 'gsap';
+import * as dat from 'dat.gui'
+
+const gui = new dat.GUI();
 
 //Initiate scene - START
     const world = {
@@ -9,24 +15,30 @@ import gsap from 'gsap';
             width: 400,
             height: 600,
             widthSegments: 50,
-            heightSegments: 50
+            heightSegments: 50,
+            position: new Vector3(0, 0, 0)
         },
         sphere: {
             radius: 30,
             widthSegments:  32,
-            heightSegments: 16
+            heightSegments: 16,
+            position: new Vector3(0, 0, 0)
         },
-        light: {
-            x: 0,
-            y: 0,
-            z: 10,
+        pointLight: {
             color: 0x55ff99,
-            intensity: 2
+            intensity: 2,
+            position: new Vector3(0, 0, 10)
         }
-    }
+    }    
+
+    var clock = new Clock(true);
 
     const scene = new Scene();
-
+    const vertexPlane = new Group();
+    const vertexSphere = new Group();
+    const particleScene = new Group();
+    const rainScene = new Group();
+    
     const camera = new PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
@@ -40,7 +52,7 @@ import gsap from 'gsap';
     renderer.setPixelRatio(devicePixelRatio);
     document.body.appendChild(renderer.domElement);
     
-    // const controls = new OrbitControls( camera, renderer.domElement );
+    const controls = new OrbitControls( camera, renderer.domElement );
 
     //Plane - START
         const plane = new Mesh(
@@ -56,9 +68,22 @@ import gsap from 'gsap';
                 vertexColors: true
             })
         );
-        plane.position.y = 80-world.plane.height / 2;
-        scene.add(plane);
+        world.plane.position.setY(80-world.plane.height / 2);
+        plane.position.y = world.plane.position.y;
+        vertexPlane.add(plane);
         generatePlane();
+        
+        var GUIPlane = gui.addFolder('Plane'); 
+        GUIPlane.add(plane, 'visible')
+        var GUIPlanePosition = GUIPlane.addFolder('Position'); 
+            GUIPlanePosition.add(plane.position, 'x').min(world.plane.position.x - 100).max(world.plane.position.x + 100).step(0.1).name('x')
+            GUIPlanePosition.add(plane.position, 'y').min(world.plane.position.y - 100).max(world.plane.position.y + 100).step(0.1).name('y')
+            GUIPlanePosition.add(plane.position, 'z').min(world.plane.position.z - 100).max(world.plane.position.z + 100).step(0.1).name('z')
+        var GUIPlaneGeometry = GUIPlane.addFolder('Geometry'); 
+            GUIPlaneGeometry.add(world.plane, 'width').min(world.plane.width - 100).max(world.plane.width + 100).step(1).name('width').onChange(generatePlane)
+            GUIPlaneGeometry.add(world.plane, 'height').min(world.plane.height - 100).max(world.plane.height + 100).step(1).name('height').onChange(generatePlane)
+            GUIPlaneGeometry.add(world.plane, 'widthSegments').min(world.plane.widthSegments - 100).max(world.plane.widthSegments + 100).step(1).name('widthSegments').onChange(generatePlane)
+            GUIPlaneGeometry.add(world.plane, 'heightSegments').min(world.plane.heightSegments - 100).max(world.plane.heightSegments + 100).step(1).name('heightSegments').onChange(generatePlane)
     //Plane - END
             
     //Sphere - START
@@ -74,39 +99,86 @@ import gsap from 'gsap';
                 side: DoubleSide
             })
         );
-        sphere.position.setY(-(world.plane.height + world.sphere.radius));
-        sphere.position.setZ(world.sphere.radius);
+        world.sphere.position.set(sphere.position.x, -(world.plane.height + world.sphere.radius), world.sphere.radius);
+        sphere.position.copy(world.sphere.position);
         sphere.rotation.z += Math.PI / 2;
         sphere.rotation.x += Math.PI;
+        vertexSphere.add(sphere);
         generateSphere();
-        scene.add(sphere);
+        
+        var GUISphere = gui.addFolder('Sphere'); 
+        GUISphere.add(sphere, 'visible')
+        var GUISpherePosition = GUISphere.addFolder('Position'); 
+            GUISpherePosition.add(sphere.position, 'x').min(world.sphere.position.x - 100).max(world.sphere.position.x + 100).step(0.1).name('x')
+            GUISpherePosition.add(sphere.position, 'y').min(world.sphere.position.y - 100).max(world.sphere.position.y + 100).step(0.1).name('y')
+            GUISpherePosition.add(sphere.position, 'z').min(world.sphere.position.z - 100).max(world.sphere.position.z + 100).step(0.1).name('z')
+        var GUISphereGeometry = GUISphere.addFolder('Geometry'); 
+            GUISphereGeometry.add(world.sphere, 'radius').min(world.sphere.radius - 100).max(world.sphere.radius + 100).step(1).name('radius').onChange(generateSphere)
+            GUISphereGeometry.add(world.sphere, 'widthSegments').min(world.sphere.widthSegments - 100).max(world.sphere.widthSegments + 100).step(1).name('widthSegments').onChange(generateSphere)
+            GUISphereGeometry.add(world.sphere, 'heightSegments').min(world.sphere.heightSegments - 100).max(world.sphere.heightSegments + 100).step(1).name('heightSegments').onChange(generateSphere)
     //Sphere - END
 
-    
+    //Particle - START
+        let vertices = [];
+        for (let i = 0; i < 10000; i++) {
+            const x = MathUtils.randFloatSpread( 2000 );
+            const y = MathUtils.randFloatSpread( 2000 );
+            const z = MathUtils.randFloatSpread( 2000 );
+            vertices.push( x, y, z );
+        }
+        const particleGeometry = new BufferGeometry();
+        const particleMaterial = new PointsMaterial( { color: 0x888888 } );
+        
+        particleGeometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
+        const particle = new Points(particleGeometry, particleMaterial)
+        particleScene.add(particle)
+        
+        var GUIParticles = gui.addFolder('Particles'); 
+        GUIParticles.add(particle, 'visible')
+        var GUIParticlesPosition = GUIParticles.addFolder('Position'); 
+            GUIParticlesPosition.add(particle.position, 'x').min(-200).max(200).step(0.1).name('x')
+            GUIParticlesPosition.add(particle.position, 'y').min(-200).max(200).step(0.1).name('y')
+            GUIParticlesPosition.add(particle.position, 'z').min(-200).max(200).step(0.1).name('z')
+
+    //Particle - END
+
+    //Rain - START
+        const rainVertices = [];
+        for ( let i = 0; i < 10000; i ++ ) {
+            const x = MathUtils.randFloatSpread( 2000 );
+            const y = MathUtils.randFloatSpread( 2000 );
+            const z = MathUtils.randFloatSpread( 2000 );
+            rainVertices.push( x, y, z );
+        }
+        const rainGeometry = new BufferGeometry();
+        
+        rainGeometry.setAttribute( 'position', new Float32BufferAttribute( rainVertices, 3 ) );
+        
+        const points = new Points( rainGeometry, new PointsMaterial( { color: 0x888888 } ) );
+        
+        // scene.add( points );    
+    //Rain - END
+
     //Lighting - START
-        const pointLight = new PointLight(world.light.color, world.light.intensity, 100)
+        const pointLight = new PointLight(world.pointLight.color, world.pointLight.intensity, 100)
         pointLight.position.set(
-            world.light.x,
-            world.light.y,
-            world.light.z
+            world.pointLight.position.x,
+            world.pointLight.position.y,
+            world.pointLight.position.z
         );
-        scene.add(pointLight);
+        vertexPlane.add(pointLight);
         
         const directionalLightTop = new DirectionalLight( 0xFFFFFF, 1);
-        scene.add( directionalLightTop );
+        vertexSphere.add( directionalLightTop );
         directionalLightTop.position.set(0, 10, 10);
-
+        directionalLightTop.intensity = 0;
+        
         const tempLight1 = new DirectionalLight( 0xFFFFFF, 1);
-        tempLight1.position.set(0, -10, -10);
-        scene.add( tempLight1 );
-        
-        const tempLight2 = new DirectionalLight( 0xFFFFFF, 1);
-        tempLight2.position.set(10, 0, -10);
-        scene.add( tempLight2 );
-        
-        const tempLight3 = new DirectionalLight( 0xFFFFFF, 1);
-        tempLight3.position.set(-10, 0, 10);
-        scene.add( tempLight3 );
+        vertexSphere.add( tempLight1 );
+        tempLight1.position.set(10, 10, 10);
+        tempLight1.intensity = 0;
+
     //Lighting - END
 
     //Axis Helper - START
@@ -117,8 +189,25 @@ import gsap from 'gsap';
         x: 0,
         y: 0
     }
+    
+    scene.add(vertexPlane, vertexSphere, particleScene, rainScene)
 
 //Initiate scene - END
+
+//GUI Settings - START
+    // plane.visible = false
+    // sphere.visible = false
+    // particle.visible = false
+    gui.__proto__.constructor.toggleHide()
+
+    // GUIPlane.open();
+    GUIPlanePosition.open();
+    GUIPlaneGeometry.open();
+
+    // GUISphere.open();
+    GUISpherePosition.open();
+    GUISphereGeometry.open();
+//GUI Settings - END
 
 function generatePlane() {
     plane.geometry.dispose();
@@ -193,10 +282,12 @@ function generateSphere() {
             colors.push(0.4, 0.19, 0)
         }
         sphere.geometry.setAttribute('color', new BufferAttribute(new Float32Array(colors), 3));
+
     // Vertices Coloring - END
 }
 
-let framePlane = 0, frameSphere = 0 
+// clock;
+let framePlane = 0, frameSphere = 0
 function animate() {
     //perform an animation and requests that the browser calls a specified function to update an animation before the next repaint
     requestAnimationFrame(animate);
@@ -212,29 +303,36 @@ function animate() {
     //Moving plane with individual vertices - END
 
     //Moving Sphere with individual vertices - START
-        frameSphere += 0.07;
+        frameSphere += 0.1;
         var {array, originalPosition, randomValues} = sphere.geometry.attributes.position
         for (let i = 0; i < array.length; i+=3) {
             if ((Math.abs(array[i + 1]) == world.sphere.radius)) {}
             else if ((i % (world.sphere.widthSegments+1) == 0) || ((i + 3) % (world.sphere.widthSegments+1) == 0)) {
-                array[i] = originalPosition[i] + Math.cos(frameSphere + randomValues[0]) * 0.01
-                array[i+1] = originalPosition[i+1] + Math.sin(frameSphere + randomValues[1]) * 0.01
-                array[i+2] = originalPosition[i+2] + Math.sin(frameSphere + randomValues[2]) * 0.01
+                array[i] = originalPosition[i] + Math.cos(frameSphere + randomValues[0]) * 0.05
+                array[i+1] = originalPosition[i+1] + Math.sin(frameSphere + randomValues[1]) * 0.05
+                array[i+2] = originalPosition[i+2] + Math.sin(frameSphere + randomValues[2]) * 0.05
             }
             else {
-                array[i] = originalPosition[i] + Math.cos(frameSphere + randomValues[i]) * 0.01
-                array[i+1] = originalPosition[i+1] + Math.sin(frameSphere + randomValues[i]) * 0.01
-                array[i+2] = originalPosition[i+2] + Math.sin(frameSphere + randomValues[i]) * 0.01
+                array[i] = originalPosition[i] + Math.cos(frameSphere + randomValues[i]) * 0.05
+                array[i+1] = originalPosition[i+1] + Math.sin(frameSphere + randomValues[i]) * 0.05
+                array[i+2] = originalPosition[i+2] + Math.sin(frameSphere + randomValues[i]) * 0.05
             }
         }
         sphere.geometry.attributes.position.needsUpdate = true;
     //Moving Sphere with individual vertices - END
 
-    //Updating light position relative to mouse position
-    pointLight.position.set(mouse.x , mouse.y, world.light.z);
-    sphere.rotation.x -= 0.005;
+    //Animating Particles - START
+        particle.material.size = (Math.sin(clock.getElapsedTime()) ) - 0.5
+        
+        particle.rotation.x = -mouse.y * (clock.getElapsedTime() * 0.00008)
+        particle.rotation.y = mouse.x * (clock.getElapsedTime() * 0.00008)
+    //Animating Particles - END
 
-    //controls.update()
+    //Updating light position relative to mouse position
+    pointLight.position.set(mouse.x , mouse.y, world.pointLight.z);
+    sphere.rotation.x -= 0.004;
+
+    // controls.update()
     renderer.render(scene, camera)
 }
 
@@ -251,24 +349,31 @@ window.addEventListener('mousemove', (event) => {
 }, false);
 
 document.getElementById("portfolio").addEventListener('click', (event) => {
-    console.log("clicked");
     let tempCameraZoomValue = 20;
     gsap.to(camera.position, {
         y: sphere.position.y,
-        duration: 3,
+        duration: 6,
         ease: "power4",
         onStart: () => {
             gsap.to(camera.position, {
-                z: camera.position.z - tempCameraZoomValue
-            })
+                z: camera.position.z - tempCameraZoomValue, duration: 5
+            });
+            gsap.to(directionalLightTop, { intensity: 1, duration: 20 });
+            gsap.to(tempLight1, { intensity: 1, duration: 20 });
+            gsap.to(particleScene.position, { y: sphere.position.y, duration: 5 });
         },
         onComplete: () => {
             gsap.to(camera.position, {
                 z: camera.position.z + tempCameraZoomValue,
-                duration: 5
-            })
-        }
-    })
+                duration: 5,
+            });
+        },
+    });
+
+    // document.querySelector("#intro").classList.add("hidden");
+    // document.querySelector("#work").classList.remove("hidden");
+    document.querySelector("#intro").classList.toggle("hidden");
+    document.querySelector("#work").classList.toggle("hidden");
 });
 
 animate();
