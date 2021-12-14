@@ -4,7 +4,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    /* display: none; */
 }
 
 body {
@@ -12,17 +11,21 @@ body {
 }
 
 .wave-button {
-    width: 150px;
+    width: 200px;
     padding: 10px 20px;
     position: relative;
     text-decoration: none;
     overflow: hidden;
     border-radius: 5% 0% 30% 30%;
-    border-color: black;
+    border: 1px solid transparent;
 }
 
 .wave-button:hover .wave {
     top: -120px;
+}
+
+.wave-button:hover {
+    border-color: whitesmoke;
 }
 
 .wave-button span {
@@ -35,7 +38,6 @@ body {
 .wave-button .wave {
     width: 200px;
     height: 200px;
-    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
     position: absolute;
     left: 0;
     top: -80px;
@@ -55,13 +57,13 @@ body {
 
 .wave-button .wave::before {
     border-radius: 45%;
-    background-color: #141414;
+    background-color: #55ffc663;
     animation: wave 5s linear infinite;
 }
 
 .wave-button .wave::after {
     border-radius: 40%;
-    background-color: rgba(20, 20, 20, 0.5);
+    background-color: #55ffd44d;
     animation: wave 10s linear infinite;
 }
 
