@@ -1,5 +1,6 @@
 import './style.css'
 import './function.js'
+import './static/data/data.json'
 import { AxesHelper, BufferAttribute, BufferGeometry, Clock, DirectionalLight, DirectionalLightHelper, DoubleSide, FlatShading, Float32BufferAttribute, Group, MathUtils, Mesh, MeshBasicMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Points, PointsMaterial, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector3, WebGLRenderer } from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import {FontLoader} from 'three/examples/jsm/loaders/FontLoader'
@@ -372,8 +373,16 @@ document.getElementById("portfolio").addEventListener('click', (event) => {
 
     // document.querySelector("#intro").classList.add("hidden");
     // document.querySelector("#work").classList.remove("hidden");
-    document.querySelector("#intro").classList.toggle("hidden");
     document.querySelector("#work").classList.toggle("hidden");
+    document.querySelector("#intro").classList.toggle("hidden");
 });
+
+Array.from(document.getElementsByClassName("work-readmore-btn")).forEach(element => {
+    element.addEventListener('click', (event) => {
+        document.querySelector("#specific").classList.toggle("hidden");
+        document.querySelector("#work").classList.toggle("hidden");
+    });
+});
+
 
 animate();
