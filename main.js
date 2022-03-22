@@ -144,18 +144,18 @@ const gui = new dat.GUI();
     //Particle - END
 
     //Rain - START
-        const rainVertices = [];
-        for ( let i = 0; i < 10000; i ++ ) {
-            const x = MathUtils.randFloatSpread( 2000 );
-            const y = MathUtils.randFloatSpread( 2000 );
-            const z = MathUtils.randFloatSpread( 2000 );
-            rainVertices.push( x, y, z );
-        }
-        const rainGeometry = new BufferGeometry();
+        // const rainVertices = [];
+        // for ( let i = 0; i < 10000; i ++ ) {
+        //     const x = MathUtils.randFloatSpread( 2000 );
+        //     const y = MathUtils.randFloatSpread( 2000 );
+        //     const z = MathUtils.randFloatSpread( 2000 );
+        //     rainVertices.push( x, y, z );
+        // }
+        // const rainGeometry = new BufferGeometry();
         
-        rainGeometry.setAttribute( 'position', new Float32BufferAttribute( rainVertices, 3 ) );
+        // rainGeometry.setAttribute( 'position', new Float32BufferAttribute( rainVertices, 3 ) );
         
-        const points = new Points( rainGeometry, new PointsMaterial( { color: 0x888888 } ) );
+        // const points = new Points( rainGeometry, new PointsMaterial( { color: 0x888888 } ) );
         
         // scene.add( points );    
     //Rain - END
@@ -372,8 +372,16 @@ document.getElementById("portfolio").addEventListener('click', (event) => {
 
     // document.querySelector("#intro").classList.add("hidden");
     // document.querySelector("#work").classList.remove("hidden");
-    document.querySelector("#intro").classList.toggle("hidden");
     document.querySelector("#work").classList.toggle("hidden");
+    document.querySelector("#intro").classList.toggle("hidden");
 });
+
+Array.from(document.getElementsByClassName("work-readmore-btn")).forEach(element => {
+    element.addEventListener('click', (event) => {
+        document.querySelector("#specific").classList.toggle("hidden");
+        document.querySelector("#work").classList.toggle("hidden");
+    });
+});
+
 
 animate();

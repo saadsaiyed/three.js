@@ -57,13 +57,13 @@ body {
 
 .wave-button .wave::before {
     border-radius: 45%;
-    background-color: #55ffc663;
+    background-color: #55f9ff63;
     animation: wave 5s linear infinite;
 }
 
 .wave-button .wave::after {
     border-radius: 40%;
-    background-color: #55ffd44d;
+    background-color: #55fff14d;
     animation: wave 10s linear infinite;
 }
 

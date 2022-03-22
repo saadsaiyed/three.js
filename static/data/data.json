@@ -1,0 +1,69 @@
+{
+    "work": [{
+            "company-name": "Trade Technocrats Ltd.",
+            "description": "Successfully created a web-based inventory management software that manages more than 3 thousand products and comprehensive individual reports which reduces false alerts on acquiring stock.",
+            "start-date": "2020-05-01",
+            "end-date": "2021-11-22",
+            "icon-class": [
+                "devicon-html5-plain",
+                "devicon-tailwindcss-original-wordmark",
+                "devicon-react-original",
+                "devicon-redux-original",
+                "devicon-nodejs-plain",
+                "devicon-express-original",
+                "devicon-mongodb-plain"
+            ],
+            "icon-title": [
+                "html5",
+                "tailwindcss",
+                "react",
+                "redux",
+                "nodejs",
+                "express",
+                "mongodb"
+            ]
+        },
+        {
+            "company-name": "Microsoft Corporation",
+            "description": "Supporting team and clients using Azure. Suggesting new work around and corrections in customer errors. Trained under strict and fast paced environment. Always working towards providing better customer satisfaction.",
+            "start-date": "2021-11-22",
+            "end-date": "Current",
+            "icon-class": [
+                "devicon-linux-plain",
+                "devicon-windows8-original",
+                "devicon-bash-plain",
+                "devicon-amazonwebservices-original"
+            ],
+            "icon-title": [
+                "linux",
+                "windows",
+                "bash",
+                "amazonwebservices"
+            ]
+        },
+        {
+            "company-name": "Internships",
+            "description": "Worked for multiple companies in the field of Web Development and Cyber Security. Demonstrated success in providing customer oriented websites. Provided security to clients applications and networks.",
+            "start-date": "",
+            "end-date": "",
+            "icon-class": [
+                "devicon-html5-plain",
+                "devicon-css3-plain",
+                "devicon-javascript-plain",
+                "devicon-php-plain",
+                "devicon-wordpress-plain",
+                "devicon-canva-original",
+                "devicon-illustrator-plain"
+            ],
+            "icon-title": [
+                "html5",
+                "css3",
+                "javascript",
+                "php",
+                "wordpress",
+                "canva",
+                "illustrator"
+            ]
+        }
+    ]
+}
