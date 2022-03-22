@@ -19,17 +19,21 @@ function loadRecentWorkOverview() {
                 // Creating Icons - START
                 var innerIconDiv = document.createElement("div");
 
-                var innerIconSubDiv = document.createElement("div");
-                innerIconSubDiv.setAttribute("class", "w-10 h-10 inline-flex items-center justify-center rounded-full bg-red-100 text-yellow-600 italic");
 
-                var iconClass = "",
-                    iconTitle = "";
-                var innerIcon = document.createElement("i")
-                innerIcon.setAttribute("class", iconClass);
-                innerIcon.setAttribute("title", iconTitle);
+                for (let i = 0; i < element["icon-class"].length; i++) {
+                    var innerIconSubDiv = document.createElement("div");
+                    innerIconSubDiv.setAttribute("class", "w-10 h-10 inline-flex items-center justify-center rounded-full bg-red-100 text-yellow-600 italic");
 
-                innerIconSubDiv.appendChild(innerIcon);
-                innerIconDiv.appendChild(innerIconSubDiv);
+                    var iconClass = "text-2xl " + element["icon-class"][i],
+                        iconTitle = element["icon-title"][i];
+
+                    var innerIcon = document.createElement("i")
+                    innerIcon.setAttribute("class", iconClass);
+                    innerIcon.setAttribute("title", iconTitle);
+
+                    innerIconSubDiv.appendChild(innerIcon);
+                    innerIconDiv.appendChild(innerIconSubDiv);
+                }
 
                 innerMainDiv.appendChild(innerIconDiv);
                 // Creating Icons - END
@@ -71,8 +75,8 @@ function loadRecentWorkOverview() {
                 // Inner Date SVG Element - END
 
                 // Inner Date Span Time Difference Element - START
-                var startDate = "2020-05-01",
-                    endDate = "2021-11-22";
+                var startDate = element["start-date"],
+                    endDate = element["end-date"];
                 var innerDateTimeDiv = document.createElement("div");
                 innerDateTimeDiv.setAttribute("class", "Date");
                 innerDateTimeDiv.setAttribute("start-date", startDate);
@@ -83,10 +87,13 @@ function loadRecentWorkOverview() {
                 innerDateSpanTimeDiff.appendChild(innerDateTimeDiv);
                 // Inner Date Span for Time Difference Calculation Element - END
 
-                // Inner Date Span Time Frame Element - START
+                // Inner Date Span Time Frame Element - START\
+                var startDateStr = (startDate == "Current") ? "Current" : (startDate == "") ? "" : moment(startDate).format('MMMM') + " " + moment(startDate).format('YYYY')
+                var endDateStr = (endDate == "Current") ? "Current" : (startDate == "") ? "" : moment(endDate).format('MMMM') + " " + moment(endDate).format('YYYY')
+                var innerDateSpanRangeText = startDateStr + " - " + endDateStr;
                 var innerDateSpanRange = document.createElement("span");
                 innerDateSpanRange.setAttribute("class", "inline-flex items-center leading-none text-sm");
-                innerDateSpanRange.append("May 2020 - November 2021");
+                innerDateSpanRange.append(innerDateSpanRangeText);
 
                 innerDateMainDiv.appendChild(innerDateSpanTimeDiff);
                 innerDateMainDiv.appendChild(innerDateSpanRange);
@@ -99,6 +106,10 @@ function loadRecentWorkOverview() {
                 var innerReadMoreDiv = document.createElement("div");
                 innerReadMoreDiv.setAttribute("class", "work-readmore-btn border rounded-2xl py-2 px-4 mt-10 cursor-pointer hover:bg-white hover:text-gray-500 inline-block");
                 innerReadMoreDiv.append("Read More");
+                innerReadMoreDiv.addEventListener('click', () => {
+                    document.querySelector("#specific").classList.toggle("hidden");
+                    document.querySelector("#work").classList.toggle("hidden");
+                });
 
                 innerMainDiv.appendChild(innerReadMoreDiv);
                 // Inner Read More Button Element - END
@@ -118,10 +129,15 @@ function loadRecentWorkOverview() {
 
                 for (let j = 0; j < dateElement.attributes.length; j++) {
                     const att = dateElement.attributes[j];
+                    if (att.nodeValue == "") {
+                        startDate = endDate = moment()
+                        break;
+                    }
+
                     if (att.nodeName == "start-date") {
-                        startDate = (att.nodeValue == "") ? moment() : moment(att.nodeValue)
+                        startDate = (att.nodeValue == "Current") ? moment() : moment(att.nodeValue)
                     } else if (att.nodeName == "end-date") {
-                        endDate = (att.nodeValue == "") ? moment() : moment(att.nodeValue)
+                        endDate = (att.nodeValue == "Current") ? moment() : moment(att.nodeValue)
                     }
                 }
 

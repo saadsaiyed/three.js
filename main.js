@@ -1,6 +1,5 @@
 import './style.css'
 import './function.js'
-import './static/data/data.json'
 import { AxesHelper, BufferAttribute, BufferGeometry, Clock, DirectionalLight, DirectionalLightHelper, DoubleSide, FlatShading, Float32BufferAttribute, Group, MathUtils, Mesh, MeshBasicMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Points, PointsMaterial, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector3, WebGLRenderer } from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import {FontLoader} from 'three/examples/jsm/loaders/FontLoader'
@@ -145,18 +144,18 @@ const gui = new dat.GUI();
     //Particle - END
 
     //Rain - START
-        const rainVertices = [];
-        for ( let i = 0; i < 10000; i ++ ) {
-            const x = MathUtils.randFloatSpread( 2000 );
-            const y = MathUtils.randFloatSpread( 2000 );
-            const z = MathUtils.randFloatSpread( 2000 );
-            rainVertices.push( x, y, z );
-        }
-        const rainGeometry = new BufferGeometry();
+        // const rainVertices = [];
+        // for ( let i = 0; i < 10000; i ++ ) {
+        //     const x = MathUtils.randFloatSpread( 2000 );
+        //     const y = MathUtils.randFloatSpread( 2000 );
+        //     const z = MathUtils.randFloatSpread( 2000 );
+        //     rainVertices.push( x, y, z );
+        // }
+        // const rainGeometry = new BufferGeometry();
         
-        rainGeometry.setAttribute( 'position', new Float32BufferAttribute( rainVertices, 3 ) );
+        // rainGeometry.setAttribute( 'position', new Float32BufferAttribute( rainVertices, 3 ) );
         
-        const points = new Points( rainGeometry, new PointsMaterial( { color: 0x888888 } ) );
+        // const points = new Points( rainGeometry, new PointsMaterial( { color: 0x888888 } ) );
         
         // scene.add( points );    
     //Rain - END
