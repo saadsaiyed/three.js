@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200&family=Ubuntu+Mono&display=swap");
+@import url("./static/fonts/googlefonts.css");
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -8,6 +8,11 @@
 
 body {
     margin: 0;
+    background-color: #333;
+}
+
+.hidden {
+    display: none;
 }
 
 .wave-button {

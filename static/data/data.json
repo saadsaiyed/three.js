@@ -2,6 +2,7 @@
     "work": [{
             "company-name": "Trade Technocrats Ltd.",
             "description": "Successfully created a web-based inventory management software that manages more than 3 thousand products and comprehensive individual reports which reduces false alerts on acquiring stock.",
+            "details": "2020-05-01",
             "start-date": "2020-05-01",
             "end-date": "2021-11-22",
             "icon-class": [
