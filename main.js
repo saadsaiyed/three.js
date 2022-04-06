@@ -69,7 +69,7 @@ const gui = new dat.GUI();
                 vertexColors: true
             })
         );
-        world.plane.position.setY(80-world.plane.height / 2);
+        world.plane.position.setY(80 - world.plane.height / 2);
         plane.position.y = world.plane.position.y;
         vertexPlane.add(plane);
         generatePlane();

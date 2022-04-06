@@ -2,9 +2,12 @@
     "work": [{
             "company-name": "Trade Technocrats Ltd.",
             "description": "Successfully created a web-based inventory management software that manages more than 3 thousand products and comprehensive individual reports which reduces false alerts on acquiring stock.",
-            "details": "2020-05-01",
+            "details": "Successfully created a web-based inventory management software that manages more than 3 thousand products and comprehensive individual reports which reduces false alerts on acquiring stock.",
             "start-date": "2020-05-01",
             "end-date": "2021-11-22",
+            "git-link": "https://github.com/saadsaiyed/trade-technocrats-proposal.git",
+            "secondary-link-name": "Live Site Link",
+            "secondary-link": "",
             "icon-class": [
                 "devicon-html5-plain",
                 "devicon-tailwindcss-original-wordmark",
@@ -27,8 +30,12 @@
         {
             "company-name": "Microsoft Corporation",
             "description": "Supporting team and clients using Azure. Suggesting new work around and corrections in customer errors. Trained under strict and fast paced environment. Always working towards providing better customer satisfaction.",
+            "details": "Supporting team and clients using Azure. Suggesting new work around and corrections in customer errors. Trained under strict and fast paced environment. Always working towards providing better customer satisfaction.",
             "start-date": "2021-11-22",
             "end-date": "Current",
+            "git-link": "",
+            "secondary-link-name": "",
+            "secondary-link": "",
             "icon-class": [
                 "devicon-linux-plain",
                 "devicon-windows8-original",
@@ -45,8 +52,12 @@
         {
             "company-name": "Internships",
             "description": "Worked for multiple companies in the field of Web Development and Cyber Security. Demonstrated success in providing customer oriented websites. Provided security to clients applications and networks.",
+            "details": "Worked for multiple companies in the field of Web Development and Cyber Security. Demonstrated success in providing customer oriented websites. Provided security to clients applications and networks.",
             "start-date": "",
             "end-date": "",
+            "git-link": "",
+            "secondary-link-name": "",
+            "secondary-link": "",
             "icon-class": [
                 "devicon-html5-plain",
                 "devicon-css3-plain",
